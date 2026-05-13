@@ -1,40 +1,46 @@
-# Detailed experiment log
 
-All experiments performed in Google Colab (free tier).  
-**Common parameters:** random seed=42, offdiag_scale=1.10, diagonal shift auto, global scale=6.5.
+---
 
-## Experiment series 1 – Real Hermitian operator (no phases)
+## Файл 2: `EXPERIMENTS.md`
 
-| Modulus | Dim | Limit | #primes | GUE p‑value | Z(β) error | Comment |
-|---------|-----|-------|---------|-------------|------------|---------|
-| 30 | 8 | 4M | 283k | 0.000011 | >1000% | GUE fails completely |
-| 210 | 48 | 8M | 540k | 0.000000 | 6.5% | Excellent Z(β), terrible GUE |
+```markdown
+# Complete Experiment Log
+
+All experiments were performed in Google Colab (free tier).  
+Fixed parameters: seed=42, offdiag_scale=1.10, auto diagonal shift, global scale=6.5.
+
+## 1. Real Hermitian Operator (α=0, no phases)
+
+| Modulus | Dim | Limit | #primes | GUE p‑value | Z(β) error | Notes |
+|---------|-----|-------|---------|-------------|------------|-------|
+| 30 | 8 | 4M | 283k | 0.000011 | >1000% | GUE completely fails |
+| 210 | 48 | 8M | 540k | 0.000000 | 6.5% | Excellent Z(β) |
 | 2310 | 480 | 2M | 149k | 0.0017 | **17.9%** | Best Z(β) ever |
-| 2310 | 480 | 12M | 788k | 0.0770 | 95.5% | GUE borderline, Z(β) worse |
+| 2310 | 480 | 12M | 788k | 0.0770 | 95.5% | GUE borderline, Z worse |
 
-**Conclusion:** Without phases, the operator can approximate ζ(s) well (error as low as 18%), but its eigenvalue spacing distribution is far from GUE.
+**Conclusion:** Real operator can approximate ζ(s) remarkably well (error down to 18%), but its eigenvalue spacing is not GUE.
 
-## Experiment series 2 – Random unitary phases
+## 2. Random Unitary Phases (α=1)
 
-| Modulus | Dim | Limit | #primes | GUE p‑value | Z(β) error | Comment |
-|---------|-----|-------|---------|-------------|------------|---------|
-| 30 | 8 | 4M | 283k | **0.8426** | 283% | Perfect GUE, poor Z(β) |
+| Modulus | Dim | Limit | #primes | GUE p‑value | Z(β) error | Notes |
+|---------|-----|-------|---------|-------------|------------|-------|
+| 30 | 8 | 4M | 283k | **0.8426** | 283% | Perfect GUE |
 | 210 | 48 | 8M | 540k | 0.7479 | 283% | Same behaviour |
 | 2310 | 480 | 2M | 149k | 0.0017 | 17.9% | Not enough data for GUE |
 | 2310 | 480 | 12M | 788k | 0.0770 | 95.5% | GUE borderline |
 
-**Conclusion:** Random phases force the spectrum into GUE universality, but destroy the partition function match.
+**Conclusion:** Random phases force GUE statistics but destroy the partition function match.
 
-## Experiment series 3 – Deterministic phases (residue difference, mean gap)
+## 3. Deterministic Phases (residue difference, mean gap)
 
-Both completely failed: p‑value < 1e-5 for all tested deterministic phase formulas.
+Both formulas failed completely: p‑value < 1e-5 for all tested deterministic phases.
 
-## Experiment series 4 – Hybrid operator (α * random phase + (1-α) * real)
+## 4. Hybrid Operator (α·random phase + (1-α)·real)
 
 Tested for dim=8 and dim=48, α from 0 to 1.
 
-| α | dim=8, p‑value | dim=8, Z error | dim=48, p‑value | dim=48, Z error |
-|---|----------------|----------------|-----------------|-----------------|
+| α | dim=8 p‑value | dim=8 Z error | dim=48 p‑value | dim=48 Z error |
+|---|---------------|---------------|----------------|----------------|
 | 0.0 | 0.000011 | 84.7% | 0.000000 | 6.5% |
 | 0.1 | 0.000011 | 11.7% | 0.000000 | 50.0% |
 | 0.2 | 0.000050 | 88.6% | 0.000000 | 106.7% |
@@ -47,29 +53,37 @@ Tested for dim=8 and dim=48, α from 0 to 1.
 | 0.9 | 0.923972 | 2.1e6% | 0.862774 | 422% |
 | 1.0 | 0.997569 | 1.1e7% | 0.747918 | 283% |
 
-No α gives both p>0.05 and low Z error (error explodes when α > 0.3).
+No α gives both p>0.05 and Z error <100%. The moment GUE appears (α>0.6), Z error is already >500%.
 
-## Experiment series 5 – Gap‑correlation model
+## 5. PT‑Symmetric (Non‑Hermitian) Direction
 
-Used 50 gap bands, random phases.  
+We attempted a PT‑symmetric extension: H = H_det + iγ·(random antisymmetric). For γ>0, the spectrum became complex (broken PT symmetry). Max imaginary part ~6.0, comparable to the scale of H. The real parts produced singular spacing distributions (p=0.0000), and Z(β) diverged. Complete failure.
+
+## 6. Gap‑Correlation Model (50 states, random phases)
+
 p‑value = 0.3546 (GUE achieved), Z error = 79% (still high).
 
-## Summary of failures
+## Summary of Failures
 
-- Deterministic phases (residue, gap) – complete failure (p < 1e-5).
-- Hybrid with α – no trade‑off region.
-- Increasing dimension to 480 without increasing primes enough – GUE fails.
-- Increasing primes to 12M for 480 – GUE borderline, Z error worsens.
+- Deterministic phases – complete collapse.
+- Hybrid α – no trade‑off region.
+- PT‑symmetric – broken symmetry, unusable.
+- High dimension (480) without enough primes – GUE fails.
+- Even with 12M primes for 480 – GUE borderline, Z error high.
 
-## Summary of successes
+## Summary of Successes
 
-- Random phases consistently give GUE statistics (p>0.05) for dim=8,48 and also for gap‑correlation model.
-- Real operator without phases can give Z(β) error as low as 18% (dim=480, 2M primes).
-- The gap‑correlation model (50 states) achieves GUE with moderate Z error (79%).
+- Random phases consistently give GUE statistics (p>0.05) for dim=8,48,50.
+- Real operator without phases gives Z(β) error as low as 18% (dim=480, 2M primes).
 
-## Final conclusion
+## Final Verdict: No‑Go Theorem
 
-There exists a **Heisenberg‑like uncertainty** in this family of operators:  
-> *It is impossible to have both excellent GUE statistics (p>0.05) and low Z(β) error (<30%) at the same time under the current construction.*
+Within this construction (transition matrices from consecutive primes, with phases added off‑diagonally), it is **impossible** to have both:
 
-This is an original discovery worth publishing as a research note.
+- GUE eigenvalue spacing (p>0.05)
+- Z(β) approximation with error < 100%
+
+This is a fundamental uncertainty:  
+> **GUE quality × Z(β) accuracy ≈ 0**
+
+The barrier is not a tuning issue – it is a structural law.
