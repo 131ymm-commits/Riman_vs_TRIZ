@@ -1,33 +1,39 @@
 # Riman_vs_TRIZ
 
-Применение теории решения изобретательских задач (ТРИЗ) к построению оператора, воспроизводящего статистику нулей дзета-функции Римана.
+Applying TRIZ (Theory of Inventive Problem Solving) to construct an operator whose spectrum reproduces the statistics of Riemann zeta zeros.
 
-## Результат
+## Result
 
-Разработан комплексный эрмитов оператор размерности 48 (mod 210) со случайными фазами.  
-Сравнение nearest‑neighbor spacing его спектра с нулями ζ(s) даёт:
+A complex Hermitian operator of dimension 48 (mod 210) with random phases is constructed.  
+Comparison of nearest‑neighbor spacing of its spectrum with the first 70 Riemann zeros yields:
 
-- KS‑statistic = 0.1098  
+- **KS‑statistic = 0.1098**  
 - **p‑value = 0.8426**
 
-→ распределения статистически неразличимы. Оператор успешно имитирует GUE‑поведение.
+→ the distributions are statistically indistinguishable. The operator successfully mimics GUE behavior.
 
-## Как запустить
+## How to run
 
-1. Установите зависимости:
+1. Install dependencies:
    ```bash
    pip install numpy sympy scipy
-Структура
-operator_riemann_triz.py – построение оператора и проверка статистики.
+   Execute the script:
 
-results.txt – сохранённые результаты (прилагается).
+bash
+python operator_riemann_triz.py
+Output includes eigenvalues and p‑value.
 
-Применённые приёмы ТРИЗ
-Дробление – увеличение размерности до φ(210)=48.
+Repository contents
+operator_riemann_triz.py – operator construction and statistical test.
 
-Переход в другое измерение – внесение комплексных фаз.
+results.txt – saved numerical results.
 
-Обратная связь – автоматическая подстройка диагонального сдвига.
+TRIZ principles applied
+Segmentation – increased dimension to φ(210)=48.
 
-Лицензия
+Transition to another dimension – introduced complex phases.
+
+Feedback – automatic diagonal shift to ensure positivity.
+
+License
 MIT
