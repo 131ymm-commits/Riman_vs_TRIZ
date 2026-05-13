@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Оператор для гипотезы Римана на основе ТРИЗ.
-Построение эрмитова оператора H размерности 48 (mod 210) со случайными фазами.
-Воспроизводит GUE‑статистику нулей дзета‑функции (p‑value = 0.8426).
+Riemann Hypothesis operator based on TRIZ.
+Constructs a Hermitian operator H of dimension 48 (mod 210) with random phases.
+Reproduces GUE statistics of Riemann zeta zeros (p-value = 0.8426).
 """
 
 import numpy as np
@@ -13,23 +13,23 @@ from scipy.stats import ks_2samp
 
 def build_operator(limit=4_000_000, modulus=210, seed=42):
     """
-    Строит комплексный эрмитов оператор H.
-    
-    Параметры:
-    - limit : верхняя граница для простых чисел
-    - modulus : модуль (210 → φ=48)
-    - seed : для воспроизводимости случайных фаз
-    
-    Возвращает:
-    - H : комплексная эрмитова матрица
-    - eigvals : её собственные значения
+    Builds a complex Hermitian operator H.
+
+    Parameters:
+    - limit : upper bound for primes
+    - modulus : modulus (210 → φ=48)
+    - seed : reproducibility for random phases
+
+    Returns:
+    - H : complex Hermitian matrix
+    - eigvals : its eigenvalues
     """
     primes = list(primerange(2, limit))
     residues = [r for r in range(1, modulus) if np.gcd(r, modulus) == 1]
     r2i = {r: i for i, r in enumerate(residues)}
     dim = len(residues)
-    
-    # Частоты и переходы
+
+    # Frequencies and transitions
     freq = np.zeros(dim)
     trans = np.zeros((dim, dim))
     for i in range(len(primes)-1):
@@ -39,11 +39,11 @@ def build_operator(limit=4_000_000, modulus=210, seed=42):
             ia, ib = r2i[a], r2i[b]
             freq[ia] += 1
             trans[ia, ib] += 1
-    
-    # Диагональ – логарифмическая энергия уровня
+
+    # Diagonal – logarithmic level energy
     H_det = np.diag(-np.log(freq / freq.sum() + 1e-12))
-    
-    # Внедиагональные элементы – взвешенные вероятности
+
+    # Off-diagonal – weighted probabilities
     offdiag_scale = 1.10
     for i in range(dim):
         row_sum = trans[i].sum()
@@ -53,10 +53,10 @@ def build_operator(limit=4_000_000, modulus=210, seed=42):
             if trans[i, j] > 12:
                 prob = trans[i, j] / row_sum
                 H_det[i, j] = -np.log(prob + 1e-9) * offdiag_scale
-    
+
     H_det = (H_det + H_det.T) / 2
-    
-    # Добавление случайных унитарных фаз (эрмитовость сохраняется)
+
+    # Add random unitary phases (preserving Hermiticity)
     np.random.seed(seed)
     phases = np.random.uniform(0, 2*np.pi, (dim, dim))
     H = H_det.astype(complex)
@@ -65,26 +65,26 @@ def build_operator(limit=4_000_000, modulus=210, seed=42):
             amp = H_det[i, j]
             H[i, j] = amp * np.exp(1j * phases[i, j])
             H[j, i] = amp * np.exp(-1j * phases[i, j])
-    
-    # Подъём диагонали для гарантии положительности спектра
+
+    # Diagonal shift to ensure positive spectrum
     eig_det = np.linalg.eigvalsh(H_det)
     shift = -np.min(eig_det) + 0.5
     H += np.eye(dim, dtype=complex) * shift
-    
-    # Масштабирование
+
+    # Global scaling
     H = H / np.max(np.abs(H)) * 6.5
-    
+
     eigvals = np.linalg.eigvalsh(H)
     return H, np.sort(eigvals)
 
 def main():
-    print("Строим оператор...")
+    print("Building operator...")
     H, eigvals = build_operator()
     dim = len(eigvals)
-    print(f"Размерность: {dim}")
-    print(f"Собственные значения: min = {eigvals.min():.4f}, max = {eigvals.max():.4f}")
-    
-    # Первые 70 нулей Римана
+    print(f"Dimension: {dim}")
+    print(f"Eigenvalues: min = {eigvals.min():.4f}, max = {eigvals.max():.4f}")
+
+    # First 70 Riemann zeros
     riemann_zeros = np.array([
         14.1347, 21.0220, 25.0109, 30.4249, 32.9351, 37.5862, 40.9187, 43.3271,
         48.0052, 49.7738, 52.9703, 56.4462, 59.3470, 60.8318, 65.1125, 67.0798,
@@ -96,30 +96,31 @@ def main():
         157.5976, 158.8495, 161.1882, 163.0307, 165.5371, 167.1844, 169.0945, 169.9116,
         173.4115, 174.7542, 176.4414, 178.3774, 180.8096, 182.8494
     ])
-    
+
     def unfold(seq):
         seq = np.sort(seq)
         spacings = np.diff(seq)
         mean_spacing = np.mean(spacings)
         return seq / mean_spacing
-    
+
     u_eig = unfold(eigvals)
     u_zeta = unfold(riemann_zeros)
     spacings_H = np.diff(u_eig)
     spacings_zeta = np.diff(u_zeta)
+
     ks_stat, p_val = ks_2samp(spacings_H, spacings_zeta)
-    
+
     print("\n" + "="*50)
-    print("РЕЗУЛЬТАТЫ СРАВНЕНИЯ С НУЛЯМИ ζ(s)")
+    print("COMPARISON WITH RIEMANN ZETA ZEROS")
     print("="*50)
-    print(f"Размерность оператора : {dim}")
-    print(f"KS-statistic         : {ks_stat:.6f}")
-    print(f"p-value              : {p_val:.6f}")
+    print(f"Operator dimension     : {dim}")
+    print(f"KS-statistic           : {ks_stat:.6f}")
+    print(f"p-value                : {p_val:.6f}")
     if p_val > 0.05:
-        print("ВЫВОД : распределения НЕРАЗЛИЧИМЫ → GUE-статистика воспроизведена")
+        print("CONCLUSION: distributions are INDISTINGUISHABLE → GUE statistics reproduced")
     else:
-        print("ВЫВОД : распределения РАЗЛИЧАЮТСЯ → требуется дальнейшая настройка")
-    
+        print("CONCLUSION: distributions are DISTINGUISHABLE → further tuning needed")
+
     return H, eigvals
 
 if __name__ == "__main__":
